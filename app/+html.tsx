@@ -27,6 +27,7 @@ export default function Root({ children }: { children: ReactNode }) {
     </html>
   );
 }
+//bu bir test denemesidir
 
 const responsiveBackground = `
 body {
