@@ -12,7 +12,7 @@ export {
 } from 'expo-router';
 
 export const unstable_settings = {
-  initialRouteName: '(tabs)',
+  initialRouteName: 'index',
 };
 
 SplashScreen.preventAutoHideAsync();
@@ -25,12 +25,6 @@ export default function RootLayout(): JSX.Element | null {
   useEffect(() => {
     if (error) throw error;
   }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
 
   if (!loaded) {
     return null;
@@ -50,14 +44,26 @@ function RootLayoutNav(): JSX.Element {
     } else {
       router.replace('/(auth)/login');
     }
+    // Keep the native splash up until routing is decided, so the home
+    // (index) initial route never flashes before the redirect lands.
+    const frame = requestAnimationFrame(() => {
+      void SplashScreen.hideAsync();
+    });
+    return () => cancelAnimationFrame(frame);
   }, [status]);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
+        <Stack.Screen name="settings" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="puzzle"
+          options={{ headerShown: false, presentation: 'modal', gestureDirection: 'vertical' }}
+        />
         <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
     </ThemeProvider>

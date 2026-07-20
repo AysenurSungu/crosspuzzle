@@ -1,0 +1,36 @@
+{
+  "puzzleId": "mock-kardiyoloji-001",
+  "source": "Kardiyoloji Ders Notu.pdf",
+  "topic": "Kalp kapak hastalıkları ve temel kavramlar",
+  "language": "tr",
+  "difficulty": "orta",
+  "note": "answer alanları grid'e harf harf yerleşecek şekilde boşluksuz ve Türkçe büyük harftir. clue ekranda ipucu barında gösterilir. length çapraz kontrol içindir.",
+  "words": [
+    { "id": 1, "answer": "AORT", "length": 4, "clue": "Kalbin sol karıncığından çıkan ana atardamar" },
+    { "id": 2, "answer": "MİTRAL", "length": 6, "clue": "Sol atriyum ile sol ventrikül arasındaki kapak" },
+    { "id": 3, "answer": "STENOZ", "length": 6, "clue": "Bir kalp kapağı açıklığının daralması" },
+    { "id": 4, "answer": "SİSTOL", "length": 6, "clue": "Kalp kasının kasılma evresi" },
+    { "id": 5, "answer": "DİYASTOL", "length": 8, "clue": "Kalp kasının gevşeme ve kanla dolma evresi" },
+    { "id": 6, "answer": "ATRİYUM", "length": 7, "clue": "Kalbin üst boşluğu; kulakçık" },
+    { "id": 7, "answer": "VENTRİKÜL", "length": 9, "clue": "Kalbin alt boşluğu; karıncık" },
+    { "id": 8, "answer": "TAKİKARDİ", "length": 9, "clue": "Dakikada 100'ün üzerinde kalp atım hızı" },
+    { "id": 9, "answer": "İSKEMİ", "length": 6, "clue": "Bir dokunun yetersiz kanlanması" },
+    { "id": 10, "answer": "ENDOKART", "length": 8, "clue": "Kalbin iç yüzeyini döşeyen ince zar" }
+  ],
+  "sampleLayout": {
+    "note": "Generator henüz yokken puzzle EKRANINI çizebilmen için elle kurulmuş, kesişimleri doğrulanmış 4 kelimelik örnek grid. Koordinatlar 0-indeksli (row, col). direction: across=yatay, down=aşağı.",
+    "rows": 9,
+    "cols": 6,
+    "placed": [
+      { "number": 1, "answer": "SİSTOL", "clue": "Kalp kasının kasılma evresi", "row": 0, "col": 1, "direction": "down" },
+      { "number": 2, "answer": "MİTRAL", "clue": "Sol atriyum ile sol ventrikül arasındaki kapak", "row": 1, "col": 0, "direction": "across" },
+      { "number": 3, "answer": "STENOZ", "clue": "Bir kalp kapağı açıklığının daralması", "row": 3, "col": 3, "direction": "down" },
+      { "number": 4, "answer": "AORT", "clue": "Kalbin sol karıncığından çıkan ana atardamar", "row": 4, "col": 0, "direction": "across" }
+    ],
+    "intersections": [
+      { "at": [1, 1], "letter": "İ", "words": ["SİSTOL", "MİTRAL"] },
+      { "at": [4, 1], "letter": "O", "words": ["SİSTOL", "AORT"] },
+      { "at": [4, 3], "letter": "T", "words": ["AORT", "STENOZ"] }
+    ]
+  }
+}

@@ -6,3 +6,5 @@ export { AppInput } from './app-input';
 export type { AppInputProps } from './app-input';
 export { Card } from './card';
 export type { CardProps } from './card';
+export { ScreenHeader } from './screen-header';
+export type { ScreenHeaderProps, ScreenHeaderAction } from './screen-header';

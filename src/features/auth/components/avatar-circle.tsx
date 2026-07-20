@@ -1,27 +1,72 @@
 import { type JSX } from 'react';
-import { View } from 'react-native';
-import { AppText } from '@/src/components/ui';
+import { Image, Pressable, View } from 'react-native';
+import { SymbolView } from 'expo-symbols';
 import { useTheme } from '@/src/theme';
+import { findAvatar } from '../avatars';
+
+const SIZE = 96;
+const BADGE = 32;
 
 export interface AvatarCircleProps {
-  initials: string;
+  avatarId: string | null;
+  onEditPress: () => void;
 }
 
-export function AvatarCircle({ initials }: AvatarCircleProps): JSX.Element {
+export function AvatarCircle({ avatarId, onEditPress }: AvatarCircleProps): JSX.Element {
   const { colors, radius } = useTheme();
+  const avatar = findAvatar(avatarId);
+
   return (
-    <View
-      accessibilityLabel={`Avatar: ${initials}`}
-      style={{
-        width: 72,
-        height: 72,
-        borderRadius: radius.full,
-        backgroundColor: colors.primarySoft,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={avatar ? 'Avatarı değiştir' : 'Avatar seç'}
+      accessibilityHint="Avatar seçme ekranını açar"
+      onPress={onEditPress}
+      style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
     >
-      <AppText variant="h3" color="accent">{initials}</AppText>
-    </View>
+      <View
+        style={{
+          width: SIZE,
+          height: SIZE,
+          borderRadius: radius.full,
+          backgroundColor: colors.primarySoft,
+          borderWidth: 1,
+          borderColor: colors.border,
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+        }}
+      >
+        {avatar ? (
+          <Image
+            source={avatar.source}
+            style={{ width: SIZE, height: SIZE }}
+            resizeMode="cover"
+          />
+        ) : null}
+      </View>
+
+      <View
+        style={{
+          position: 'absolute',
+          right: -2,
+          bottom: -2,
+          width: BADGE,
+          height: BADGE,
+          borderRadius: radius.full,
+          backgroundColor: colors.primary,
+          borderWidth: 2,
+          borderColor: colors.card,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <SymbolView
+          name={{ ios: 'pencil', android: 'edit', web: 'edit' }}
+          tintColor={colors.primaryContrast}
+          size={16}
+        />
+      </View>
+    </Pressable>
   );
 }

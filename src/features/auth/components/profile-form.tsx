@@ -1,24 +1,21 @@
-import { type JSX } from 'react';
+import { useState, type JSX } from 'react';
 import { View } from 'react-native';
 import { AppButton, AppInput, AppText, Card } from '@/src/components/ui';
 import { useTheme } from '@/src/theme';
 import { useProfileSetup } from '../hooks/use-profile-setup';
 import { AvatarCircle } from './avatar-circle';
-import { LanguageSelector } from './language-selector';
+import { AvatarPickerModal } from './avatar-picker-modal';
 
 export function ProfileForm(): JSX.Element {
   const { spacing } = useTheme();
+  const [pickerVisible, setPickerVisible] = useState(false);
   const {
     username,
-    displayName,
-    language,
-    initials,
+    avatarId,
     usernameError,
-    displayNameError,
     submitting,
     setUsername,
-    setDisplayName,
-    setLanguage,
+    setAvatarId,
     submit,
   } = useProfileSetup();
 
@@ -26,7 +23,7 @@ export function ProfileForm(): JSX.Element {
     <Card style={{ alignItems: 'center', gap: spacing[4] }}>
       <AppText variant="h2">Profilini oluştur</AppText>
 
-      <AvatarCircle initials={initials} />
+      <AvatarCircle avatarId={avatarId} onEditPress={() => setPickerVisible(true)} />
 
       <View style={{ width: '100%', gap: spacing[3] }}>
         <AppInput
@@ -38,17 +35,6 @@ export function ProfileForm(): JSX.Element {
           autoCorrect={false}
           error={usernameError ?? undefined}
         />
-        <AppInput
-          label="Görünen isim"
-          placeholder="Ayşe Yılmaz"
-          value={displayName}
-          onChangeText={setDisplayName}
-          error={displayNameError ?? undefined}
-        />
-        <View style={{ gap: spacing[1] }}>
-          <AppText variant="label" color="secondary">Dil</AppText>
-          <LanguageSelector value={language} onChange={setLanguage} />
-        </View>
       </View>
 
       <AppButton
@@ -57,6 +43,16 @@ export function ProfileForm(): JSX.Element {
         loading={submitting}
         style={{ width: '100%' }}
         accessibilityHint="Profili kaydeder ve uygulamayı başlatır"
+      />
+
+      <AvatarPickerModal
+        visible={pickerVisible}
+        selectedId={avatarId}
+        onApply={(id) => {
+          setAvatarId(id);
+          setPickerVisible(false);
+        }}
+        onClose={() => setPickerVisible(false)}
       />
     </Card>
   );

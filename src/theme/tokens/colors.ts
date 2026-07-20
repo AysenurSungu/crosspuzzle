@@ -10,6 +10,16 @@ export const lightColors = {
   primarySoft: '#d7f0e6',
   primaryContrast: '#ffffff',
 
+  // Brand header block — a constant emerald across light/dark so the
+  // home hero reads the same regardless of theme.
+  brandHeader: '#0d5c44',
+  brandHeaderPill: '#0f6b50',
+  brandHeaderControl: '#0a4835',
+  brandBright: '#a9f0cf',
+  brandBrightText: '#0d3b2c',
+  onBrand: '#f0faf5',
+  onBrandMuted: '#a7ccbd',
+
   text: '#1a1a1a',
   textSecondary: '#555555',
   textMuted: '#999999',
@@ -37,6 +47,14 @@ export const darkColors: Colors = {
   primary: '#4fc09a',
   primarySoft: '#1e4238',
   primaryContrast: '#0f1512',
+
+  brandHeader: '#0d5c44',
+  brandHeaderPill: '#0f6b50',
+  brandHeaderControl: '#0a4835',
+  brandBright: '#a9f0cf',
+  brandBrightText: '#0d3b2c',
+  onBrand: '#f0faf5',
+  onBrandMuted: '#a7ccbd',
 
   text: '#f2f2f2',
   textSecondary: '#c8c8c8',
