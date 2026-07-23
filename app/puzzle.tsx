@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import {
   ClueBar,
   PuzzleActions,
@@ -22,12 +22,19 @@ import {
 import { useTheme } from '@/src/theme';
 
 const MAX_CELL = 44;
+// Seconds granted each time the player asks for more time.
+const EXTRA_SECONDS = 120;
 
 export default function PuzzleScreen(): JSX.Element {
   const { colors, spacing, isDark } = useTheme();
   const { width } = useWindowDimensions();
+  const params = useLocalSearchParams<{ limit?: string }>();
   const inputRef = useRef<TextInput>(null);
   const keyboardVisible = useRef(false);
+
+  // limit in minutes; 0 / missing / invalid means "Süresiz" (count up).
+  const limitMinutes = Number(params.limit ?? '0');
+  const isCountdown = Number.isFinite(limitMinutes) && limitMinutes > 0;
 
   const puzzle = usePuzzle(samplePuzzle.sampleLayout);
   const {
@@ -47,6 +54,7 @@ export default function PuzzleScreen(): JSX.Element {
   } = puzzle;
 
   const [elapsed, setElapsed] = useState(0);
+  const [remaining, setRemaining] = useState(isCountdown ? limitMinutes * 60 : 0);
 
   // Track real keyboard visibility: after it is dismissed the hidden input
   // still reports focused, so a plain focus() would be a no-op.
@@ -63,12 +71,25 @@ export default function PuzzleScreen(): JSX.Element {
     };
   }, []);
 
-  // Count up until the puzzle is solved.
+  // Count up (Süresiz) until solved.
   useEffect(() => {
-    if (isSolved) return;
+    if (isCountdown || isSolved) return;
     const id = setInterval(() => setElapsed((value) => value + 1), 1000);
     return () => clearInterval(id);
-  }, [isSolved]);
+  }, [isCountdown, isSolved]);
+
+  // Count down (limitli). Clamps at 0 — time running out does NOT end the
+  // game; the player can add more time from the topbar.
+  useEffect(() => {
+    if (!isCountdown || isSolved) return;
+    const id = setInterval(() => setRemaining((value) => Math.max(0, value - 1)), 1000);
+    return () => clearInterval(id);
+  }, [isCountdown, isSolved]);
+
+  const timeUp = isCountdown && remaining <= 0;
+  const addTime = (): void => {
+    setRemaining((value) => value + EXTRA_SECONDS);
+  };
 
   const closePuzzle = (): void => {
     if (router.canGoBack()) router.back();
@@ -114,7 +135,15 @@ export default function PuzzleScreen(): JSX.Element {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={{ paddingTop: spacing[2] }}>
-          <PuzzleTopbar label="Solo · Pratik" elapsedSeconds={elapsed} onClose={closePuzzle} />
+          <PuzzleTopbar
+            label="Solo · Pratik"
+            seconds={isCountdown ? remaining : elapsed}
+            countdown={isCountdown}
+            timeUp={timeUp}
+            extraLabel={`+${EXTRA_SECONDS / 60} dk`}
+            onAddTime={addTime}
+            onClose={closePuzzle}
+          />
         </View>
 
         <ScrollView

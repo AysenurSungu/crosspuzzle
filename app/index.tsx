@@ -8,6 +8,7 @@ import {
   SamplePuzzleCard,
   SourcesSection,
 } from '@/src/features/home';
+import { pickSource } from '@/src/features/generate';
 import { useTheme } from '@/src/theme';
 
 export default function HomeScreen(): JSX.Element {
@@ -34,8 +35,18 @@ export default function HomeScreen(): JSX.Element {
     router.push('/puzzle');
   };
 
-  // TODO: route to the generate/upload flow once it exists.
-  // Left as no-ops so the hub-and-spoke shell is stable.
+  // Open the system file picker; on selection continue to the generate flow.
+  // The file itself is not read yet — generation uses the sample data.
+  const uploadSource = async (): Promise<void> => {
+    const picked = await pickSource();
+    if (picked === null) return;
+    router.push({ pathname: '/generate', params: { source: picked.name } });
+  };
+  const onUpload = (): void => {
+    void uploadSource();
+  };
+
+  // TODO: wire the QR scan action once it exists.
   const noop = (): void => {};
 
   return (
@@ -54,11 +65,11 @@ export default function HomeScreen(): JSX.Element {
           onProfilePress={openProfile}
           onSettingsPress={openSettings}
           onScanPress={noop}
-          onPrimaryPress={noop}
+          onPrimaryPress={onUpload}
         />
 
         <View style={{ padding: spacing[5], gap: spacing[6] }}>
-          <SourcesSection onUploadPress={noop} />
+          <SourcesSection onUploadPress={onUpload} />
           <SamplePuzzleCard onPress={openSamplePuzzle} />
           <HowItWorks />
         </View>
