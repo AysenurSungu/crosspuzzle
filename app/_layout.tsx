@@ -58,6 +58,9 @@ function RootLayoutNav(): JSX.Element {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
+        <Stack.Screen name="generate" options={{ headerShown: false }} />
+        <Stack.Screen name="preparing" options={{ headerShown: false, gestureEnabled: false }} />
+        <Stack.Screen name="review" options={{ headerShown: false }} />
         <Stack.Screen
           name="puzzle"
           options={{ headerShown: false, presentation: 'modal', gestureDirection: 'vertical' }}
