@@ -1,23 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { validateOtp } from '../validation';
+import { AuthError, sendOtp, verifyOtp } from '../api/otp';
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 42;
-
-// TODO: replace with `supabase.auth.verifyOtp({ email, token, type: 'email' })`
-function verifyOtpRequest(_email: string, _code: string): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 600);
-  });
-}
-
-// TODO: replace with `supabase.auth.signInWithOtp({ email })`
-function resendOtpRequest(_email: string): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 400);
-  });
-}
 
 export interface UseOtpVerifyResult {
   digits: readonly string[];
@@ -94,8 +81,10 @@ export function useOtpVerify(email: string): UseOtpVerifyResult {
     setError(null);
     setSubmitting(true);
     try {
-      await verifyOtpRequest(email, digits.join(''));
+      await verifyOtp(email, digits.join(''));
       router.replace('/(auth)/profile-setup');
+    } catch (err) {
+      setError(err instanceof AuthError ? err.message : 'Kod doğrulanamadı. Tekrar dene.');
     } finally {
       setSubmitting(false);
     }
@@ -103,9 +92,14 @@ export function useOtpVerify(email: string): UseOtpVerifyResult {
 
   const resend = useCallback(async () => {
     if (secondsLeft > 0) return;
-    await resendOtpRequest(email);
-    setDigits(Array<string>(OTP_LENGTH).fill(''));
-    startCountdown();
+    try {
+      await sendOtp(email);
+      setDigits(Array<string>(OTP_LENGTH).fill(''));
+      setError(null);
+      startCountdown();
+    } catch (err) {
+      setError(err instanceof AuthError ? err.message : 'Kod tekrar gönderilemedi.');
+    }
   }, [email, secondsLeft, startCountdown]);
 
   const canResend = useMemo(() => secondsLeft === 0, [secondsLeft]);

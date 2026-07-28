@@ -40,5 +40,6 @@ yarn-error.*
 /ios
 /android
 
-.env
-.env.local
+# tüm env dosyaları ignore; sadece .env.example commit'lenir
+.env*
+!.env.example

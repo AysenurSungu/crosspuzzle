@@ -1,14 +1,7 @@
 import { useCallback, useState } from 'react';
 import { router } from 'expo-router';
 import { validateEmail } from '../validation';
-
-// TODO: swap the fake delay with `supabase.auth.signInWithOtp({ email })`
-// via TanStack Query mutation once the API layer lands (STATE-API.md).
-function sendOtpRequest(_email: string): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 600);
-  });
-}
+import { AuthError, sendOtp } from '../api/otp';
 
 export interface UseEmailLoginResult {
   email: string;
@@ -30,11 +23,14 @@ export function useEmailLogin(): UseEmailLoginResult {
       return;
     }
 
+    const trimmed = email.trim();
     setError(null);
     setSubmitting(true);
     try {
-      await sendOtpRequest(email.trim());
-      router.push({ pathname: '/(auth)/verify', params: { email: email.trim() } });
+      await sendOtp(trimmed);
+      router.push({ pathname: '/(auth)/verify', params: { email: trimmed } });
+    } catch (err) {
+      setError(err instanceof AuthError ? err.message : 'Kod gönderilemedi. Tekrar dene.');
     } finally {
       setSubmitting(false);
     }
