@@ -1,9 +1,15 @@
 import { type JSX } from 'react';
 import { View } from 'react-native';
+import { router } from 'expo-router';
 import { AppButton, AppText, Card } from '@/src/components/ui';
 import { useTheme } from '@/src/theme';
 import { formatCountdown, useOtpVerify } from '../hooks/use-otp-verify';
 import { OtpInput } from './otp-input';
+
+function changeEmail(): void {
+  if (router.canGoBack()) router.back();
+  else router.replace('/(auth)/login');
+}
 
 export interface OtpFormProps {
   email: string;
@@ -29,6 +35,13 @@ export function OtpForm({ email }: OtpFormProps): JSX.Element {
       <AppText variant="caption" color="secondary" style={{ textAlign: 'center' }}>
         {email} adresine 6 haneli kod gönderdik.
       </AppText>
+      <AppButton
+        label="E-postayı değiştir"
+        onPress={changeEmail}
+        variant="ghost"
+        style={{ paddingHorizontal: spacing[1], paddingVertical: 0, minHeight: 0 }}
+        accessibilityHint="Giriş ekranına dönüp e-posta adresini düzeltir"
+      />
 
       <View style={{ marginTop: spacing[4] }}>
         <OtpInput digits={digits} onChangeDigit={setDigit} onBackspace={handleBackspace} />

@@ -1,7 +1,9 @@
 // Lightweight validators used until Zod + react-hook-form are added
 // (STATE-API.md mandates Zod once the packages are installed).
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
+// yerel@alan.tld — uzantı (tld) en az 2 harf olmalı ("a@b.c" gibi yazımları eler).
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+// Büyük/küçük harf serbest; sadece harf, rakam ve alt tire (3-20).
+const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
 
 export function validateEmail(value: string): string | null {
   const trimmed = value.trim();
@@ -20,7 +22,7 @@ export function validateOtp(digits: readonly string[]): string | null {
 export function validateUsername(value: string): string | null {
   const trimmed = value.trim();
   if (trimmed.length === 0) return 'Kullanıcı adı boş olamaz';
-  if (!USERNAME_RE.test(trimmed)) return 'Küçük harf, rakam, alt tire — 3-20 karakter';
+  if (!USERNAME_RE.test(trimmed)) return 'Harf, rakam, alt tire — 3-20 karakter';
   return null;
 }
 

@@ -9,14 +9,19 @@ import {
   SourcesSection,
 } from '@/src/features/home';
 import { pickSource } from '@/src/features/generate';
+import { useProfileStore } from '@/src/stores/profile-store';
 import { useTheme } from '@/src/theme';
 
 export default function HomeScreen(): JSX.Element {
   const { colors, spacing } = useTheme();
   const params = useLocalSearchParams<{ name?: string; avatarId?: string }>();
+  const storedName = useProfileStore((state) => state.username);
+  const storedAvatarId = useProfileStore((state) => state.avatarId);
 
-  const name = params.name && params.name.length > 0 ? params.name : 'öğrenci';
-  const avatarId = params.avatarId && params.avatarId.length > 0 ? params.avatarId : null;
+  const name =
+    storedName ?? (params.name && params.name.length > 0 ? params.name : 'öğrenci');
+  const avatarId =
+    storedAvatarId ?? (params.avatarId && params.avatarId.length > 0 ? params.avatarId : null);
 
   // Zero-state values for a brand-new user. These will come from the
   // profile / progress store once it is wired to Supabase.

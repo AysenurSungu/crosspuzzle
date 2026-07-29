@@ -3,14 +3,19 @@ import { ScrollView, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { AppText, ScreenHeader } from '@/src/components/ui';
 import { BadgeGrid, LevelCard, ProfileAvatar, StatCards, type StatItem } from '@/src/features/profile';
+import { useProfileStore } from '@/src/stores/profile-store';
 import { useTheme } from '@/src/theme';
 
 export default function ProfileScreen(): JSX.Element {
   const { colors, spacing } = useTheme();
   const params = useLocalSearchParams<{ name?: string; avatarId?: string }>();
+  const storedName = useProfileStore((state) => state.username);
+  const storedAvatarId = useProfileStore((state) => state.avatarId);
 
-  const username = params.name && params.name.length > 0 ? params.name : 'ogrenci';
-  const avatarId = params.avatarId && params.avatarId.length > 0 ? params.avatarId : null;
+  const username =
+    storedName ?? (params.name && params.name.length > 0 ? params.name : 'ogrenci');
+  const avatarId =
+    storedAvatarId ?? (params.avatarId && params.avatarId.length > 0 ? params.avatarId : null);
 
   // Zero-state progress for a brand-new user. Replace with the progress
   // store once it is wired to Supabase.

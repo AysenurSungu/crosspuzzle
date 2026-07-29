@@ -12,6 +12,7 @@ export interface SettingsPillProps {
   status: string;
   avatarId: string | null;
   onNotificationsPress: () => void;
+  onAvatarPress?: () => void;
 }
 
 export function SettingsPill({
@@ -19,23 +20,13 @@ export function SettingsPill({
   status,
   avatarId,
   onNotificationsPress,
+  onAvatarPress,
 }: SettingsPillProps): JSX.Element {
   const { colors, radius, spacing } = useTheme();
   const avatar = findAvatar(avatarId);
 
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing[3],
-        backgroundColor: colors.card,
-        borderRadius: radius.full,
-        borderWidth: 1,
-        borderColor: colors.borderMuted,
-        padding: spacing[2],
-      }}
-    >
+  const avatarInner = (
+    <>
       <View
         style={{
           width: AVATAR_SIZE,
@@ -59,6 +50,59 @@ export function SettingsPill({
           </AppText>
         )}
       </View>
+      {onAvatarPress ? (
+        <View
+          style={{
+            position: 'absolute',
+            right: -2,
+            bottom: -2,
+            width: 20,
+            height: 20,
+            borderRadius: radius.full,
+            backgroundColor: colors.primary,
+            borderWidth: 2,
+            borderColor: colors.card,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <SymbolView
+            name={{ ios: 'pencil', android: 'edit', web: 'edit' }}
+            tintColor={colors.primaryContrast}
+            size={10}
+          />
+        </View>
+      ) : null}
+    </>
+  );
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing[3],
+        backgroundColor: colors.card,
+        borderRadius: radius.full,
+        borderWidth: 1,
+        borderColor: colors.borderMuted,
+        padding: spacing[2],
+      }}
+    >
+      {onAvatarPress ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Avatarı değiştir"
+          accessibilityHint="Avatar seçme ekranını açar"
+          onPress={onAvatarPress}
+          hitSlop={8}
+          style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+        >
+          {avatarInner}
+        </Pressable>
+      ) : (
+        <View>{avatarInner}</View>
+      )}
 
       <View style={{ flex: 1 }}>
         <AppText variant="bodyStrong" numberOfLines={1}>Merhaba, {name}</AppText>

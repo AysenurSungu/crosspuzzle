@@ -1,18 +1,8 @@
 import { useCallback, useState } from 'react';
 import { router } from 'expo-router';
 import { validateUsername } from '../validation';
-
-// TODO: replace with a mutation that writes to the `profiles` table
-// via an Edge Function (SUPABASE-RLS.md forbids client-side skor/xp,
-// but a profile create is safe under RLS if the row belongs to auth.uid()).
-function saveProfileRequest(_input: {
-  username: string;
-  avatarId: string | null;
-}): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 500);
-  });
-}
+import { ProfileError, UsernameTakenError, createProfile } from '../api/profile';
+import { useProfileStore } from '@/src/stores/profile-store';
 
 export interface UseProfileSetupResult {
   username: string;
@@ -42,14 +32,21 @@ export function useProfileSetup(): UseProfileSetupResult {
 
     setSubmitting(true);
     try {
-      await saveProfileRequest({
-        username: username.trim(),
-        avatarId,
-      });
+      const trimmed = username.trim();
+      await createProfile({ username: trimmed, avatarId });
+      useProfileStore.getState().setProfile({ username: trimmed, avatarId });
       router.replace({
         pathname: '/',
-        params: { name: username.trim(), avatarId: avatarId ?? '' },
+        params: { name: trimmed, avatarId: avatarId ?? '' },
       });
+    } catch (err) {
+      if (err instanceof UsernameTakenError) {
+        setUsernameError(err.message);
+      } else if (err instanceof ProfileError) {
+        setUsernameError(err.message);
+      } else {
+        setUsernameError('Profil kaydedilemedi. Tekrar dene.');
+      }
     } finally {
       setSubmitting(false);
     }

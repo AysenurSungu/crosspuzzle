@@ -10,4 +10,6 @@ export { OtpForm } from './components/otp-form';
 export { ProfileForm } from './components/profile-form';
 export { OtpInput } from './components/otp-input';
 export { AvatarCircle } from './components/avatar-circle';
+export { AvatarPickerModal } from './components/avatar-picker-modal';
+export type { AvatarPickerModalProps } from './components/avatar-picker-modal';
 export { BrandLogo } from './components/brand-logo';

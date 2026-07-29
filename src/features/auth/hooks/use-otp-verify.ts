@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { validateOtp } from '../validation';
 import { AuthError, sendOtp, verifyOtp } from '../api/otp';
+import { getMyProfile } from '../api/profile';
+import { useProfileStore } from '@/src/stores/profile-store';
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 42;
@@ -82,7 +84,18 @@ export function useOtpVerify(email: string): UseOtpVerifyResult {
     setSubmitting(true);
     try {
       await verifyOtp(email, digits.join(''));
-      router.replace('/(auth)/profile-setup');
+      // Profili olan (daha önce kayıt olup username seçmiş) kullanıcı username
+      // ekranını atlar; ilk kez giren ise profil kurulumuna gider.
+      const profile = await getMyProfile();
+      if (profile !== null) {
+        useProfileStore.getState().setProfile(profile);
+        router.replace({
+          pathname: '/',
+          params: { name: profile.username, avatarId: profile.avatarId ?? '' },
+        });
+      } else {
+        router.replace('/(auth)/profile-setup');
+      }
     } catch (err) {
       setError(err instanceof AuthError ? err.message : 'Kod doğrulanamadı. Tekrar dene.');
     } finally {
