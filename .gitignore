@@ -43,3 +43,7 @@ yarn-error.*
 # tüm env dosyaları ignore; sadece .env.example commit'lenir
 .env*
 !.env.example
+
+# Supabase (CLI geçici dosyaları)
+supabase/.temp/
+supabase/.branches/
