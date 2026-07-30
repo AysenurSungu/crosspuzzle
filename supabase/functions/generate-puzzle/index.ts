@@ -39,7 +39,7 @@ const ALLOWED_DIFFICULTY = new Set(["kolay", "orta", "zor"]);
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...CORS, "content-type": "application/json" },
+    headers: { ...CORS, "content-type": "application/json; charset=utf-8" },
   });
 }
 
@@ -54,9 +54,8 @@ async function generateWords(args: {
   pdfBase64: string;
   topic: string;
   difficulty: string;
-  language: string;
   requestCount: number;
-}): Promise<GeneratedWord[]> {
+}): Promise<{ words: GeneratedWord[]; language: string }> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -85,7 +84,6 @@ async function generateWords(args: {
               text: buildUserInstruction({
                 topic: args.topic,
                 difficulty: args.difficulty,
-                language: args.language,
                 requestCount: args.requestCount,
               }),
             },
@@ -109,14 +107,16 @@ async function generateWords(args: {
   const toolUse = Array.isArray(content)
     ? content.find((block) => block?.type === "tool_use")
     : undefined;
-  const words = toolUse?.input?.words;
-  if (!Array.isArray(words)) {
-    throw new HttpError(502, "Claude beklenen yapıda çıktı vermedi.");
+  const input = toolUse?.input;
+  if (!input || !Array.isArray(input.words)) {
+    throw new HttpError(502, "Model beklenen yapıda çıktı vermedi.");
   }
-  return words.filter(
+  const words = input.words.filter(
     (w): w is GeneratedWord =>
       w && typeof w.answer === "string" && typeof w.clue === "string",
   );
+  const language = typeof input.language === "string" ? input.language.trim() : "";
+  return { words, language };
 }
 
 Deno.serve(async (req) => {
@@ -140,15 +140,15 @@ Deno.serve(async (req) => {
     const wordCount = clampInt(body.wordCount ?? 20, 5, 30);
     const rawDifficulty = (body.difficulty ?? "").trim().toLowerCase();
     const difficulty = ALLOWED_DIFFICULTY.has(rawDifficulty) ? rawDifficulty : "orta";
-    const language = (body.language ?? "tr").trim() || "tr";
     const topic = (body.topic ?? "").trim();
     const sourceName = (body.sourceName ?? "").trim() || "Yüklenen PDF";
 
     // Engine bazı kelimeleri eleyeceği için hedeften ~%40 fazla iste (üst sınır 40).
     const requestCount = Math.min(40, Math.round(wordCount * 1.4));
 
-    // 1) Claude → kelime + ipucu
-    const words = await generateWords({ apiKey, pdfBase64, topic, difficulty, language, requestCount });
+    // 1) Model → kelime + ipucu (+ kaynaktan algılanan dil)
+    const { words, language: detected } = await generateWords({ apiKey, pdfBase64, topic, difficulty, requestCount });
+    const language = detected || (body.language ?? "").trim() || "tr";
 
     // 2) Engine → kesişimli grid (client'ın render edebileceği layout)
     const { layout, dropped } = buildLayout(words, wordCount);
