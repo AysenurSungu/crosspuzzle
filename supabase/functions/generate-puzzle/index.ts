@@ -11,7 +11,7 @@
 import { buildLayout, LayoutError } from "./crossword/grid-builder.ts";
 import { displayLetters } from "./crossword/letters.ts";
 import type { GeneratedWord } from "./crossword/types.ts";
-import { buildUserInstruction, SYSTEM_PROMPT, WORDS_TOOL } from "./prompt.ts";
+import { buildUserInstruction, SYSTEM_PROMPT, WORDS_TOOL } from "./promt1.ts";
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -163,6 +163,7 @@ Deno.serve(async (req) => {
       answer: p.answer,
       length: displayLetters(p.answer).length,
       clue: p.clue,
+      enumeration: p.enumeration,
     }));
 
     const puzzle = {

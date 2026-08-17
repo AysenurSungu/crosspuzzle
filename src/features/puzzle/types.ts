@@ -9,12 +9,17 @@ export interface PuzzleWord {
   answer: string;
   length: number;
   clue: string;
+  /** Multi-word answers: letters per word (e.g. "VENA CAVA" -> [4, 4]). */
+  enumeration?: number[];
 }
 
 export interface PlacedWord {
   number: number;
+  /** Grid form: no spaces, one contiguous run even for multi-word terms. */
   answer: string;
   clue: string;
+  /** Multi-word answers: letters per word (e.g. "VENA CAVA" -> [4, 4]). */
+  enumeration?: number[];
   row: number;
   col: number;
   direction: Direction;
@@ -65,6 +70,8 @@ export interface RenderClue {
   direction: Direction;
   clue: string;
   length: number;
+  /** Multi-word answers: letters per word (e.g. [4, 4] -> shown as "(4, 4)"). */
+  enumeration?: number[];
   row: number;
   col: number;
   cells: ReadonlyArray<{ row: number; col: number }>;

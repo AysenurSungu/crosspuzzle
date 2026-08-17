@@ -12,8 +12,14 @@ export interface GeneratedWord {
 /** Izgaraya yerleştirilmiş, numaralandırılmış kelime. */
 export interface PlacedWord {
   number: number;
+  /** Izgaraya giren biçim: BOŞLUKSUZ, harf harf. Çok kelimeli terimlerde de tek run. */
   answer: string;
   clue: string;
+  /**
+   * Çok kelimeli cevaplarda her kelimenin harf sayısı (ör. "VENA CAVA" → [4, 4]).
+   * Tek kelimede [n]. Client ipucunda "(4, 4)" gösterir, çözümde boşluklu yazar.
+   */
+  enumeration?: number[];
   row: number;
   col: number;
   direction: Direction;

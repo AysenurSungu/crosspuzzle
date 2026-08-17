@@ -10,6 +10,7 @@ import type { Direction, PlacedWord } from "./types.ts";
 interface Unnumbered {
   answer: string;
   clue: string;
+  enumeration?: number[];
   row: number;
   col: number;
   direction: Direction;
@@ -40,6 +41,7 @@ export function assignNumbers(words: Unnumbered[]): PlacedWord[] {
       number,
       answer: w.answer,
       clue: w.clue,
+      enumeration: w.enumeration,
       row: w.row,
       col: w.col,
       direction: w.direction,

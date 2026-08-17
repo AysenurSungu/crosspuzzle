@@ -22,11 +22,40 @@ const STEP: Record<Direction, { dr: number; dc: number }> = {
 };
 
 const MIN_PLACED = 3;
+const MAX_WORDS = 3; // Çok kelimeli terimlerde üst sınır (Latince/tıp: en çok 3 sözcük).
+const MAX_LETTERS = 16; // Toplam harf üst sınırı — çok uzun cevap ızgarayı zorlar.
 
 interface Candidate {
+  /** Izgara biçimi: BOŞLUKSUZ birleşik harfler. */
   answer: string;
   clue: string;
   letters: string[];
+  /** Her sözcüğün harf sayısı (ör. "VENA CAVA" → [4, 4]). */
+  enumeration: number[];
+}
+
+/**
+ * Ham cevabı ızgara biçimine ayrıştırır: boşluk/tire ile böl, her parçayı görünen
+ * BÜYÜK harfe çevir, harf-dışı içeren parçaları ele. Döner: birleşik `answer`,
+ * harf dizisi ve sözcük uzunlukları (`enumeration`). Uygun değilse null.
+ */
+function parseAnswer(raw: string): { answer: string; letters: string[]; enumeration: number[] } | null {
+  const parts = raw
+    .split(/[\s\-–—]+/)
+    .map((p) => toDisplayWord(p))
+    .filter((p) => p.length > 0);
+  if (parts.length === 0 || parts.length > MAX_WORDS) return null;
+
+  const enumeration: number[] = [];
+  const letters: string[] = [];
+  for (const part of parts) {
+    const ls = Array.from(part);
+    if (!ls.every(isLetter)) return null; // rakam/sembol içeren parça → at
+    enumeration.push(ls.length);
+    letters.push(...ls);
+  }
+  if (letters.length < 2 || letters.length > MAX_LETTERS) return null;
+  return { answer: letters.join(""), letters, enumeration };
 }
 
 interface RawPlacement extends Candidate {
@@ -44,13 +73,16 @@ function prepareCandidates(words: GeneratedWord[]): Candidate[] {
   const out: Candidate[] = [];
   for (const w of words) {
     if (!w || typeof w.answer !== "string" || typeof w.clue !== "string") continue;
-    const answer = toDisplayWord(w.answer);
-    const letters = Array.from(answer);
-    if (letters.length < 2) continue; // tek harf işe yaramaz
-    if (!letters.every(isLetter)) continue; // boşluk/rakam/sembol → çok kelimeli, at
-    if (seen.has(answer)) continue; // aynı cevabı iki kez alma
-    seen.add(answer);
-    out.push({ answer, clue: w.clue.trim(), letters });
+    const parsed = parseAnswer(w.answer);
+    if (parsed === null) continue; // ızgaraya uygun değil (boş/çok uzun/harf-dışı)
+    if (seen.has(parsed.answer)) continue; // aynı cevabı iki kez alma
+    seen.add(parsed.answer);
+    out.push({
+      answer: parsed.answer,
+      clue: w.clue.trim(),
+      letters: parsed.letters,
+      enumeration: parsed.enumeration,
+    });
   }
   out.sort((a, b) => b.letters.length - a.letters.length);
   return out;
@@ -175,6 +207,7 @@ export function buildLayout(words: GeneratedWord[], targetCount: number): BuildR
     placements.map((p) => ({
       answer: p.answer,
       clue: p.clue,
+      enumeration: p.enumeration,
       row: p.row - minR,
       col: p.col - minC,
       direction: p.direction,

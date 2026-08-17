@@ -8,6 +8,12 @@ export interface ClueBarProps {
   clue: RenderClue | null;
 }
 
+/** Çok kelimeli cevaplarda "(4, 4)" biçiminde kelime uzunlukları; tek kelimede boş. */
+function enumerationLabel(enumeration?: number[]): string {
+  if (!enumeration || enumeration.length < 2) return '';
+  return ` (${enumeration.join(', ')})`;
+}
+
 export function ClueBar({ clue }: ClueBarProps): JSX.Element {
   const { colors, radius, spacing } = useTheme();
 
@@ -28,6 +34,7 @@ export function ClueBar({ clue }: ClueBarProps): JSX.Element {
         <>
           <AppText variant="label" color="accent">
             {clue.number} {clue.direction === 'across' ? 'Yatay' : 'Aşağı'} · {clue.length} harf
+            {enumerationLabel(clue.enumeration)}
           </AppText>
           <AppText variant="bodyStrong">{clue.clue}</AppText>
         </>

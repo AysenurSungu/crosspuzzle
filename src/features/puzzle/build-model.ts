@@ -57,6 +57,7 @@ export function buildPuzzleModel(layout: PuzzleLayout): PuzzleModel {
       direction: word.direction,
       clue: word.clue,
       length: letters.length,
+      enumeration: word.enumeration,
       row: word.row,
       col: word.col,
       cells: path,
